@@ -16,8 +16,19 @@ import {
   X
 } from 'lucide-react';
 
-const Chatbot = () => {
-  const [messages, setMessages] = useState([
+// Import types from separate file
+import { Message, ChatResponse, Language, ChatHistoryItem } from '../types/api';
+
+// Component-specific interface (only used in this file)
+interface SidebarContentProps {
+  isMemoryOn: boolean;
+  setIsMemoryOn: (value: boolean) => void;
+  chatHistory: ChatHistoryItem[];
+  onClose?: () => void;
+}
+
+const Chatbot: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       type: 'bot',
@@ -25,18 +36,18 @@ const Chatbot = () => {
       timestamp: new Date()
     }
   ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isMemoryOn, setIsMemoryOn] = useState(true);
-  const [selectedLanguage, setSelectedLanguage] = useState('EN');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [inputMessage, setInputMessage] = useState<string>('');
+  const [isMemoryOn, setIsMemoryOn] = useState<boolean>(true);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('EN');
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const languages = [
+  const languages: Language[] = [
     { code: 'EN', name: 'English' },
     { code: 'ES', name: 'Español' }
-    
   ];
 
-  const chatHistory = [
+  const chatHistory: ChatHistoryItem[] = [
     { id: 1, title: 'Chest pain symptoms', time: '2 hours ago' },
     { id: 2, title: 'Diabetes management', time: '1 day ago' },
     { id: 3, title: 'Medication interactions', time: '3 days ago' },
@@ -44,10 +55,10 @@ const Chatbot = () => {
     { id: 5, title: 'Exercise recommendations', time: '2 weeks ago' }
   ];
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async (): Promise<void> => {
     if (!inputMessage.trim()) return;
 
-    const newUserMessage = {
+    const newUserMessage: Message = {
       id: messages.length + 1,
       type: 'user',
       content: inputMessage,
@@ -55,29 +66,64 @@ const Chatbot = () => {
     };
 
     setMessages([...messages, newUserMessage]);
-    
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
+    const currentInput = inputMessage;
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      // Use relative path - Vite will proxy to http://localhost:5000/api/chat
+      const response = await fetch('/ai/chat', {  // Changed from /api/chat
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    message: currentInput,
+    language: selectedLanguage,
+    memory: isMemoryOn
+  })
+});
+
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: ChatResponse = await response.json();
+      
+      const botResponse: Message = {
         id: messages.length + 2,
         type: 'bot',
-        content: "I understand you're asking about " + inputMessage + ". Based on your symptoms, I'd recommend consulting with a healthcare professional for a proper diagnosis. In the meantime, here are some general guidelines that might be helpful...",
+        content: data.reply || "I apologize, but I couldn't generate a response. Please try again.",
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, botResponse]);
-    }, 1000);
 
-    setInputMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        type: 'bot',
+        content: "I'm sorry, I'm having trouble connecting to the AI service. Please make sure the server is running and try again.",
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const copyMessage = (content: string) => {
+  const copyMessage = (content: string): void => {
     navigator.clipboard.writeText(content);
   };
 
@@ -86,7 +132,10 @@ const Chatbot = () => {
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsSidebarOpen(false)} />
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50" 
+            onClick={() => setIsSidebarOpen(false)} 
+          />
           <div className="fixed left-0 top-0 bottom-0 w-80 bg-slate-800 border-r border-slate-700 z-50">
             <SidebarContent 
               isMemoryOn={isMemoryOn}
@@ -203,6 +252,25 @@ const Chatbot = () => {
               </div>
             </div>
           ))}
+          
+          {/* Loading Indicator */}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="max-w-3xl">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-violet-600">
+                    <Activity className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="rounded-2xl px-4 py-3 bg-slate-700 text-gray-100">
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-violet-500"></div>
+                      <span className="text-sm">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Area */}
@@ -218,18 +286,19 @@ const Chatbot = () => {
                   className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 resize-none"
                   rows={1}
                   style={{ minHeight: '44px', maxHeight: '120px' }}
+                  disabled={isLoading}
                 />
               </div>
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim()}
+                disabled={!inputMessage.trim() || isLoading}
                 className="bg-violet-600 hover:bg-violet-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors"
               >
                 <Send className="w-5 h-5" />
               </button>
             </div>
             <div className="mt-2 text-xs text-gray-500 text-center">
-             CURA AI can make mistakes. Please consult healthcare professionals for medical advice.
+              CURA AI can make mistakes. Please consult healthcare professionals for medical advice.
             </div>
           </div>
         </div>
@@ -238,7 +307,12 @@ const Chatbot = () => {
   );
 };
 
-const SidebarContent = ({ isMemoryOn, setIsMemoryOn, chatHistory, onClose }: any) => {
+const SidebarContent: React.FC<SidebarContentProps> = ({ 
+  isMemoryOn, 
+  setIsMemoryOn, 
+  chatHistory, 
+  onClose 
+}) => {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}

@@ -85,6 +85,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Light theme defaults: improve contrast */
+:root {
+  /* Backgrounds and text tuned for higher contrast */
+  --app-bg: #f8fafc; /* slate-50 */
+  --app-text: #0f172a; /* slate-900 */
+  --muted-text: #334155; /* slate-700 */
+  --border-color: #e2e8f0; /* slate-200 */
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+/* Generic light theme improvements for common elements */
+a { color: #4f46e5; }
+a:hover { color: #4338ca; }
+
+/* Borders look a bit stronger in light mode */
+.border { border-color: var(--border-color); }
+
 /* Message bubble animations */
 .message-bubble {
   animation: slideInMessage 0.3s ease-out;
