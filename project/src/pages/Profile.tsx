@@ -1,6 +1,11 @@
+// Profile — UI v2. Previous version: project/legacy/pages/Profile.tsx
+// Logic unchanged (useAuth().updateProfile, edit/cancel). Adds the Navbar so the page isn't a dead end.
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Mail, Edit3, Save, X, MessageSquare, AtSign, User, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Mail, Calendar, Edit3, Save, X } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Container, Card, Alert, btn, inputClass } from '../components/ui';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -16,171 +21,114 @@ const Profile = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
-    }
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
   };
 
   const handleSave = async () => {
     setIsLoading(true);
     setErrors({});
-
     try {
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
     } catch (error: any) {
-      setErrors({
-        general: error.message || 'Failed to update profile. Please try again.',
-      });
+      setErrors({ general: error.message || 'Failed to update profile. Please try again.' });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setFormData({
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      username: user?.username || '',
-    });
+    setFormData({ firstName: user?.firstName || '', lastName: user?.lastName || '', username: user?.username || '' });
     setIsEditing(false);
     setErrors({});
     setSuccess('');
   };
 
+  const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`.toUpperCase() || 'U';
+
+  const fields: { name: keyof typeof formData; label: string; icon: typeof User; display: string }[] = [
+    { name: 'firstName', label: 'First name', icon: User, display: user?.firstName ?? '' },
+    { name: 'lastName', label: 'Last name', icon: User, display: user?.lastName ?? '' },
+    { name: 'username', label: 'Username', icon: AtSign, display: user?.username ? `@${user.username}` : '' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white dark:bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-gray-200 dark:border-white/20 shadow-2xl">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="bg-violet-600 p-3 rounded-full">
-                <User className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1 py-10 sm:py-14">
+        <Container className="max-w-3xl">
+          {/* Identity header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+            <div className="flex items-center gap-4">
+              <span className="w-16 h-16 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300 text-xl font-semibold flex items-center justify-center">
+                {initials}
+              </span>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white truncate">{user?.firstName} {user?.lastName}</h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
               </div>
+            </div>
+            <Link to="/chatbot" className={btn('secondary')}><MessageSquare className="w-4 h-4" /> Open chat</Link>
+          </div>
+
+          <Card className="mt-8 p-0 overflow-hidden">
+            <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Profile
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Manage your account information
-                </p>
+                <h2 className="font-semibold text-slate-900 dark:text-white">Account information</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Manage your personal details</p>
               </div>
+              {!isEditing && (
+                <button onClick={() => { setIsEditing(true); setSuccess(''); }} className={btn('secondary')}>
+                  <Edit3 className="h-4 w-4" /> Edit
+                </button>
+              )}
             </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors"
-              >
-                <Edit3 className="h-4 w-4" />
-                <span>Edit Profile</span>
-              </button>
+
+            <div className="p-6">
+              {success && <div className="mb-5"><Alert tone="success">{success}</Alert></div>}
+              {errors.general && <div className="mb-5"><Alert tone="error">{errors.general}</Alert></div>}
+
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                {fields.map(f => (
+                  <div key={f.name}>
+                    <dt><label htmlFor={f.name} className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">{f.label}</label></dt>
+                    <dd>
+                      {isEditing ? (
+                        <div className="relative">
+                          <f.icon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <input id={f.name} name={f.name} type="text" value={formData[f.name]} onChange={handleInputChange} className={inputClass(!!errors[f.name])} />
+                        </div>
+                      ) : (
+                        <p className="text-[15px] text-slate-900 dark:text-white min-h-[22px]">{f.display || '—'}</p>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+                <div>
+                  <dt className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">Email</dt>
+                  <dd className="flex items-center gap-2 text-[15px] text-slate-900 dark:text-white">
+                    <Mail className="h-4 w-4 text-slate-400" /> <span className="truncate">{user?.email}</span>
+                  </dd>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Email cannot be changed</p>
+                </div>
+              </dl>
+            </div>
+
+            {isEditing && (
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40">
+                {/* OLD: grey "Cancel" button (bg-gray-500) */}
+                <button onClick={handleCancel} className={btn('secondary')}><X className="h-4 w-4" /> Cancel</button>
+                <button onClick={handleSave} disabled={isLoading} className={btn('primary')}>
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {isLoading ? 'Saving…' : 'Save changes'}
+                </button>
+              </div>
             )}
-          </div>
-
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <p className="text-sm text-green-700 dark:text-green-300">{success}</p>
-            </div>
-          )}
-
-          {errors.general && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-700 dark:text-red-300">{errors.general}</p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                First Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="block w-full px-3 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
-                />
-              ) : (
-                <p className="text-gray-900 dark:text-white">{user?.firstName}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Last Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="block w-full px-3 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
-                />
-              ) : (
-                <p className="text-gray-900 dark:text-white">{user?.lastName}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Username
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  className="block w-full px-3 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
-                />
-              ) : (
-                <p className="text-gray-900 dark:text-white">@{user?.username}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-              </label>
-              <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <p className="text-gray-900 dark:text-white">{user?.email}</p>
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Email cannot be changed
-              </p>
-            </div>
-          </div>
-
-          {isEditing && (
-            <div className="flex items-center space-x-4 mt-8 pt-6 border-t border-gray-200 dark:border-slate-700">
-              <button
-                onClick={handleSave}
-                disabled={isLoading}
-                className="flex items-center space-x-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save className="h-4 w-4" />
-                <span>{isLoading ? 'Saving...' : 'Save Changes'}</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
-              >
-                <X className="h-4 w-4" />
-                <span>Cancel</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+          </Card>
+        </Container>
+      </main>
     </div>
   );
 };

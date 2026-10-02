@@ -47,10 +47,15 @@ export const userAPI = {
     firstName: string;
     lastName: string;
   }) => {
-    return apiRequest('/users/register', {
+    const response = await apiRequest('/users/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
+    // Store token on registration, same as login
+    if (response.token) {
+      localStorage.setItem('authToken', response.token);
+    }
+    return response;
   },
 
   // Login user
@@ -82,6 +87,22 @@ export const userAPI = {
     return apiRequest('/users/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
+    });
+  },
+
+  // Forgot password: request a reset link (printed to the server console in development)
+  forgotPassword: async (email: string) => {
+    return apiRequest('/users/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  // Reset password using the token from the reset link
+  resetPassword: async (data: { email: string; token: string; password: string }) => {
+    return apiRequest('/users/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 
@@ -120,6 +141,7 @@ export const chatAPI = {
   addMessage: async (sessionId: string, message: {
     role: 'user' | 'assistant' | 'system';
     content: string;
+    meta?: unknown; // structured response metadata (assistant only)
   }) => {
     return apiRequest(`/chats/${sessionId}/messages`, {
       method: 'POST',

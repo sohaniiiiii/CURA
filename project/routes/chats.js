@@ -23,7 +23,8 @@ const authenticateToken = (req, res, next) => {
 // Create a new chat session
 router.post('/create', authenticateToken, async (req, res) => {
   try {
-    const { title } = req.body;
+    // Title is derived client-side from the first question; trimmed + capped here
+    const title = typeof req.body.title === 'string' ? req.body.title.trim().slice(0, 80) : '';
     const sessionId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const chat = new Chat({
@@ -90,10 +91,17 @@ router.get('/:sessionId', authenticateToken, async (req, res) => {
 router.post('/:sessionId/messages', authenticateToken, async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const { role, content } = req.body;
+    const { role, content, meta } = req.body;
 
     if (!role || !content) {
       return res.status(400).json({ message: 'Role and content are required' });
+    }
+    // Only user/assistant messages are written from the client
+    if (!['user', 'assistant'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role' });
+    }
+    if (typeof content !== 'string' || content.length > 20000) {
+      return res.status(400).json({ message: 'Invalid message content' });
     }
 
     const chat = await Chat.findOne({
@@ -109,7 +117,9 @@ router.post('/:sessionId/messages', authenticateToken, async (req, res) => {
     const newMessage = {
       role,
       content,
-      timestamp: new Date()
+      timestamp: new Date(),
+      // meta is stored only for assistant replies (plain object, else ignored)
+      ...(role === 'assistant' && meta && typeof meta === 'object' ? { meta } : {})
     };
 
     chat.messages.push(newMessage);
@@ -129,7 +139,11 @@ router.post('/:sessionId/messages', authenticateToken, async (req, res) => {
 router.put('/:sessionId/title', authenticateToken, async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const { title } = req.body;
+    // OLD: const { title } = req.body;  (accepted empty / any-length titles)
+    const title = typeof req.body.title === 'string' ? req.body.title.trim().slice(0, 80) : '';
+    if (!title) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
 
     const chat = await Chat.findOneAndUpdate(
       { sessionId, userId: req.userId, isActive: true },

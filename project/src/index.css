@@ -5,7 +5,8 @@
 
 * {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  /* font-size: 14px;  — OLD: forced every element to 14px and broke size inheritance
+     (e.g. <strong> inside larger text). Base size now comes from html { font-size: 14px }. */
 }
 
 /* Custom scrollbar */
@@ -66,6 +67,7 @@ html {
 }
 
 /* Focus styles */
+/* OLD: outline on every mouse click too
 button:focus,
 input:focus,
 textarea:focus,
@@ -73,6 +75,18 @@ select:focus {
   outline: 2px solid #8b5cf6 !important;
   outline-offset: 2px;
 }
+*/
+/* Keyboard-only focus ring */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+[role="switch"]:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+/* Chat composer shows focus on its wrapper instead */
+textarea.chat-input:focus,
+textarea.chat-input:focus-visible { outline: none; }
 
 /* Custom gradient backgrounds */
 .gradient-bg {
@@ -99,22 +113,42 @@ body {
   color: var(--app-text);
 }
 
+.dark {
+  --app-bg: #020617;      /* slate-950 */
+  --app-text: #f1f5f9;    /* slate-100 */
+  --muted-text: #94a3b8;  /* slate-400 */
+  --border-color: #1e293b;/* slate-800 */
+  color-scheme: dark;
+}
+
 /* Generic light theme improvements for common elements */
+/* OLD (unlayered, overrode Tailwind text colors on every link):
 a { color: #4f46e5; }
-a:hover { color: #4338ca; }
+a:hover { color: #4338ca; } */
+@layer base {
+  a { color: inherit; }
+}
 
 /* Borders look a bit stronger in light mode */
-.border { border-color: var(--border-color); }
+/* OLD (unlayered, so it overrode every Tailwind border-* color incl. dark mode):
+.border { border-color: var(--border-color); } */
+@layer base {
+  *, ::before, ::after { border-color: var(--border-color); }
+}
 
 /* Message bubble animations */
 .message-bubble {
-  animation: slideInMessage 0.3s ease-out;
+  animation: slideInMessage 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message-bubble, .animate-pulse { animation: none; }
 }
 
 @keyframes slideInMessage {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;

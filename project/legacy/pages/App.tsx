@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -28,20 +25,16 @@ const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) 
 
 function AppRoutes() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      {/* OLD wrapper: className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300" */}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         {/* PHASE 1: /chatbot and /profile now require authentication */}
         <Route path="/chatbot" element={<ProtectedRoute element={<Chatbot />} />} />
         <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
         <Route path="/*" element={
-          <div className="min-h-screen flex flex-col">
+          <div>
             <Navbar />
-            <main className="flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/use-cases" element={<UseCases />} />
@@ -49,8 +42,6 @@ function AppRoutes() {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
             </Routes>
-            </main>
-            <Footer />
           </div>
         } />
       </Routes>

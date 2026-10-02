@@ -1,120 +1,87 @@
-import React from 'react';
-import { 
-  Target, 
-  ArrowRight,
-  Mail,
-  Linkedin,
-  Github
-} from 'lucide-react';
+// About — UI v2. Previous version: project/legacy/pages/About.tsx
+import { Target, ArrowRight, Mail, Linkedin, Github, HeartPulse, Globe, ShieldCheck } from 'lucide-react';
+import { PageHeader, Section, SectionHeading, Card, IconTile, ButtonLink, CtaBand } from '../components/ui';
 
-const About = () => {
-  const teamMembers = [
-    { name: 'Afsin', social: { linkedin: '#', github: '#' } },
-    { name: 'Sohani', social: { linkedin: '#', github: '#' } },
-    { name: 'Usha Sri', social: { linkedin: '#', github: '#' } },
-    { name: 'Divya', social: { linkedin: '#', github: '#' } },
-    { name: 'Vishnu Priya', social: { linkedin: '#', github: '#' } }
-  ];
+const teamMembers = [
+  { name: 'Afsin', social: { linkedin: '#', github: '#' } },
+  { name: 'Sohani', social: { linkedin: '#', github: '#' } },
+  { name: 'Usha Sri', social: { linkedin: '#', github: '#' } },
+  { name: 'Divya', social: { linkedin: '#', github: '#' } },
+  { name: 'Vishnu Priya', social: { linkedin: '#', github: '#' } },
+];
 
-  const achievements = [
-    {
-      icon: Target,
-      title: '95% Accuracy',
-      description: 'Medical response accuracy validated by healthcare professionals'
-    }
-  ];
+const achievements = [
+  { icon: Target, title: '95% Accuracy', description: 'Medical response accuracy validated by healthcare professionals' },
+];
 
-  return (
-    <div className="min-h-screen py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center space-y-4 mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">
-            About{' '}
-            <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-             CURA
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Democratizing healthcare AI to serve billions across languages and cultures, 
-            making quality medical assistance accessible to everyone, everywhere.
-          </p>
-        </div>
+const values = [
+  { icon: HeartPulse, title: 'Patient first', text: 'Clear, safe guidance that knows when to send you to a doctor.' },
+  { icon: Globe, title: 'Accessible', text: 'Health information in the languages people actually speak.' },
+  { icon: ShieldCheck, title: 'Transparent', text: 'Confidence, sources and reasoning shown with every answer.' },
+];
 
-        {/* Achievements */}
-        <div className="mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-            Key Achievement
-          </h2>
-          <div className="grid md:grid-cols-1 gap-8 max-w-xl mx-auto">
-            {achievements.map((achievement, index) => (
-              <div
-                key={index}
-                className="text-center p-6 bg-slate-800/50 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition-colors"
-              >
-                <div className="w-16 h-16 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <achievement.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{achievement.title}</h3>
-                <p className="text-gray-300">{achievement.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+const initials = (name: string) => name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
 
-        {/* Team */}
-        <div className="mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-            Meet Our Team
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {teamMembers.map((member, index) => (
-              <div
-                key={index}
-                className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700 hover:border-violet-500/50 transition-colors text-center"
-              >
-                <h3 className="text-xl font-bold text-white mb-4">{member.name}</h3>
-                <div className="flex justify-center space-x-3">
-                  <a
-                    href={member.social.linkedin}
-                    className="p-2 bg-slate-700 rounded-lg text-gray-400 hover:text-white hover:bg-violet-600 transition-colors"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                  <a
-                    href={member.social.github}
-                    className="p-2 bg-slate-700 rounded-lg text-gray-400 hover:text-white hover:bg-violet-600 transition-colors"
-                  >
-                    <Github className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+const socialBtn =
+  'p-2 rounded-lg text-slate-500 hover:text-violet-700 hover:bg-violet-50 dark:text-slate-400 dark:hover:text-violet-300 dark:hover:bg-violet-500/10 transition-colors';
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-br from-violet-600/20 to-blue-600/20 rounded-3xl p-12 border border-violet-500/30 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Join Us in Transforming Healthcare
-          </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Be part of our mission to make quality healthcare accessible to everyone.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="group bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-violet-500/25">
-              <span>Get Involved</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="group border-2 border-violet-600 text-violet-400 hover:bg-violet-600 hover:text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
-              <Mail className="w-5 h-5" />
-              <span>Contact Us</span>
-            </button>
-          </div>
-        </div>
+const About = () => (
+  <div>
+    <PageHeader
+      eyebrow="About"
+      title="About CURA-X"
+      description="Democratizing healthcare AI to serve billions across languages and cultures, making quality medical assistance accessible to everyone, everywhere."
+    />
+
+    <Section>
+      <div className="grid md:grid-cols-3 gap-5">
+        {values.map(v => (
+          <Card key={v.title}>
+            <IconTile icon={v.icon} />
+            <h2 className="mt-4 font-semibold text-slate-900 dark:text-white">{v.title}</h2>
+            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{v.text}</p>
+          </Card>
+        ))}
       </div>
-    </div>
-  );
-};
+
+      {achievements.map(a => (
+        <div key={a.title} className="mt-5 rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5">
+          <IconTile icon={a.icon} />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">Key achievement</p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">{a.title}</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{a.description}</p>
+          </div>
+        </div>
+      ))}
+    </Section>
+
+    <Section muted>
+      <SectionHeading eyebrow="Team" title="Meet our team" />
+      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {teamMembers.map((m) => (
+          <li key={m.name} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 p-5 text-center">
+            <span className="mx-auto w-14 h-14 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300 font-semibold flex items-center justify-center">
+              {initials(m.name)}
+            </span>
+            <h3 className="mt-3 font-medium text-slate-900 dark:text-white">{m.name}</h3>
+            <div className="mt-2 flex justify-center gap-1">
+              <a href={m.social.linkedin} className={socialBtn} aria-label={`${m.name} on LinkedIn`}><Linkedin className="w-4 h-4" /></a>
+              <a href={m.social.github} className={socialBtn} aria-label={`${m.name} on GitHub`}><Github className="w-4 h-4" /></a>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
+
+    <Section>
+      <CtaBand title="Join us in transforming healthcare" description="Be part of our mission to make quality healthcare accessible to everyone.">
+        {/* OLD: non-functional <button>Get Involved</button> / <button>Contact Us</button> */}
+        <ButtonLink to="/signup" className="h-11 px-5">Get involved <ArrowRight className="w-4 h-4" /></ButtonLink>
+        <ButtonLink to="/contact" variant="secondary" className="h-11 px-5"><Mail className="w-4 h-4" /> Contact us</ButtonLink>
+      </CtaBand>
+    </Section>
+  </div>
+);
 
 export default About;

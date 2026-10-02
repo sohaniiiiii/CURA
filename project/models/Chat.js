@@ -23,6 +23,12 @@ const chatSchema = new mongoose.Schema({
     timestamp: {
       type: Date,
       default: Date.now
+    },
+    // Phase: persistent history — structured response metadata shown in the UI
+    // (confidence / sources / explanation / emergency). Optional; assistant messages only.
+    meta: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined
     }
   }],
   title: {

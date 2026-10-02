@@ -1,10 +1,22 @@
+# ============================================================
+# PHASE 1 — Groq migration
+# Old Apollo-2B / ML dependencies preserved as comments.
+# Uncomment only if reverting to local model inference.
+# ============================================================
+
+# ---- OLD ML DEPENDENCIES (Apollo-2B + LoRA) — DO NOT DELETE ----
+# torch==2.1.0
+# transformers==4.36.0
+# peft==0.7.1
+# accelerate==0.25.0
+# bitsandbytes==0.41.3
+# safetensors==0.4.1
+# sentencepiece==0.1.99
+# protobuf==3.20.3
+# ---- END OLD ML DEPENDENCIES ----
+
+# ---- PHASE 1 ACTIVE DEPENDENCIES ----
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-transformers==4.36.0
-peft==0.7.1
-torch==2.1.0
-accelerate==0.25.0
-bitsandbytes==0.41.3
-safetensors==0.4.1
-sentencepiece==0.1.99
-protobuf==3.20.3
+groq>=0.9.0
+python-dotenv>=1.0.0

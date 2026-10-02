@@ -1,148 +1,128 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Brain, Globe, Shield, Database, Image, Users, Activity } from 'lucide-react';
+// Home — UI v2. Previous version: project/legacy/pages/Home.tsx
+import { ArrowRight, Brain, Globe, Shield, Database, Image, Users, ShieldCheck, BookOpen, Lightbulb, MessageSquare, Search, CheckCircle2 } from 'lucide-react';
+import { Section, SectionHeading, Card, IconTile, ButtonLink, CtaBand, Container } from '../components/ui';
 
-const Home = () => {
-  const features = [
-    {
-      icon: Brain,
-      title: 'Persistent Memory',
-      description: 'CURA remembers your medical history and previous conversations for personalized care.'
-    },
-    {
-      icon: Users,
-      title: 'Personalized Medical Responses',
-      description: 'Get tailored health advice based on your unique profile and medical history.'
-    },
-    {
-      icon: Database,
-      title: 'Health Data Integration',
-      description: 'Seamlessly integrate with your existing health records and wearable devices.'
-    },
-    {
-      icon: Globe,
-      title: 'Multilingual Support',
-      description: 'Communicate in 2 languages: English and Spanish.'
-    },
-    {
-      icon: Image,
-      title: 'Medical Image Generation',
-      description: 'Generate visual aids and medical diagrams to better understand your health.'
-    },
-    {
-      icon: Shield,
-      title: 'Secure & Private',
-      description: 'Your health data is encrypted and protected with enterprise-grade security.'
-    }
-  ];
+const features = [
+  { icon: Brain, title: 'Persistent Memory', description: 'CURA remembers your medical history and previous conversations for personalized care.' },
+  { icon: Users, title: 'Personalized Medical Responses', description: 'Get tailored health advice based on your unique profile and medical history.' },
+  { icon: Database, title: 'Health Data Integration', description: 'Seamlessly integrate with your existing health records and wearable devices.' },
+  { icon: Globe, title: 'Multilingual Support', description: 'Communicate in 2 languages: English and Spanish.' },
+  { icon: Image, title: 'Medical Image Generation', description: 'Generate visual aids and medical diagrams to better understand your health.' },
+  { icon: Shield, title: 'Secure & Private', description: 'Your health data is encrypted and protected with enterprise-grade security.' },
+];
 
-  return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-16 lg:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-blue-600/10 dark:from-violet-600/20 dark:via-transparent dark:to-blue-600/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                  Smarter Healthcare,{' '}
-                  <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-                    Powered by Cura
-                  </span>
-                </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
-                  Cura is a lightweight multilingual medical LLM designed to bring healthcare AI to 2B+ people in 2 languages.
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  to="/features"
-                  className="group bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-violet-500/25 text-sm"
-                >
-                  <span>Explore Cura</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to="/chatbot"
-                  className="group border-2 border-violet-600 text-violet-600 dark:text-violet-400 hover:bg-violet-600 hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2 text-sm"
-                >
-                  <span>View Live Demo</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
+// The CURA-X answer pipeline (target design)
+const steps = [
+  { icon: MessageSquare, title: 'Ask', text: 'Describe symptoms or ask a health question in plain language.' },
+  { icon: Search, title: 'Retrieve', text: 'Relevant medical knowledge is gathered to ground the answer.' },
+  { icon: ShieldCheck, title: 'Verify', text: 'The answer is scored for confidence and checked for safety.' },
+  { icon: Lightbulb, title: 'Explain', text: 'You get the answer with sources and why it was given.' },
+];
 
-            {/* Hero Image */}
-            <div className="relative lg:order-last">
-              <div className="relative w-full h-80 lg:h-96 rounded-2xl overflow-hidden bg-gradient-to-br from-violet-600/20 to-blue-600/20 dark:from-violet-600/30 dark:to-blue-600/30 backdrop-blur-sm border border-violet-500/20 dark:border-violet-500/30">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-gradient-to-br from-violet-500 to-blue-500 rounded-full flex items-center justify-center shadow-2xl">
-                      <Activity className="w-12 h-12 text-white" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-300 text-base">AI-Powered Healthcare Assistant</p>
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/50 dark:from-slate-900/50 to-transparent"></div>
-              </div>
-            </div>
-          </div>
+// Static product preview — mirrors the real chat response card
+const HeroPreview = () => (
+  <div className="relative">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none overflow-hidden">
+      <div className="flex items-center gap-1.5 px-4 h-10 border-b border-slate-100 dark:border-slate-800">
+        <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+        <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+        <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+        <span className="ml-3 text-xs text-slate-400">CURA-X chat</span>
+      </div>
+      <div className="p-5 space-y-4" aria-hidden>
+        <div className="flex justify-end">
+          <p className="rounded-2xl rounded-br-md bg-violet-600 text-white text-sm px-3.5 py-2 max-w-[80%]">I have a sore throat and mild fever. What can I do at home?</p>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-gray-50 dark:bg-slate-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              Powerful Features for Better Healthcare
-            </h2>
-            <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Cura combines cutting-edge AI with medical expertise to provide personalized healthcare assistance.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-violet-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10"
-              >
-                <div className="w-10 h-10 bg-violet-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-violet-500 transition-colors">
-                  <feature.icon className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">{feature.description}</p>
-              </div>
+        <div className="rounded-2xl rounded-tl-md border border-slate-200 dark:border-slate-800 p-4 text-sm text-slate-700 dark:text-slate-300">
+          <p className="font-semibold text-slate-900 dark:text-white">Home remedies:</p>
+          <ul className="mt-1.5 space-y-1">
+            {['Warm salt-water gargle 3–4× a day', 'Rest and plenty of fluids', 'Honey-lemon tea to soothe the throat'].map(t => (
+              <li key={t} className="flex gap-2"><span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-violet-500 flex-shrink-0" />{t}</li>
             ))}
+          </ul>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30 px-2 py-0.5 text-xs font-medium">
+              <ShieldCheck className="w-3 h-3" /> High confidence · 91%
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 text-xs"><BookOpen className="w-3 h-3" /> 2 sources</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 text-xs"><Lightbulb className="w-3 h-3" /> Why this answer?</span>
           </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-violet-600/10 to-blue-600/10 dark:from-violet-600/20 dark:to-blue-600/20 rounded-2xl p-8 border border-violet-500/20 dark:border-violet-500/30">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Ready to Experience Smarter Healthcare?
-            </h2>
-            <p className="text-base text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-              Join thousands of users who trust Cura for their healthcare needs. Start your conversation today.
-            </p>
-            <Link
-              to="/chatbot"
-              className="group bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 inline-flex items-center space-x-2 shadow-lg hover:shadow-violet-500/25 text-sm"
-            >
-              <span>Try Cura Now</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
-  );
-};
+  </div>
+);
+
+const Home = () => (
+  <div>
+    {/* Hero */}
+    <section className="pt-14 pb-16 sm:pt-20 sm:pb-24">
+      <Container>
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> AI health assistant
+            </span>
+            <h1 className="mt-5 text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.1] text-slate-900 dark:text-white">
+              Smarter healthcare, <span className="text-violet-600 dark:text-violet-400">powered by CURA-X</span>
+            </h1>
+            <p className="mt-5 text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
+              Cura is a lightweight multilingual medical LLM designed to bring healthcare AI to 2B+ people in 2 languages.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <ButtonLink to="/chatbot" className="h-11 px-5">Try the assistant <ArrowRight className="w-4 h-4" /></ButtonLink>
+              <ButtonLink to="/features" variant="secondary" className="h-11 px-5">Explore features</ButtonLink>
+            </div>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
+              {['Confidence on every answer', 'Cited sources', 'Plain-language explanations'].map(t => (
+                <li key={t} className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" />{t}</li>
+              ))}
+            </ul>
+          </div>
+          <HeroPreview />
+        </div>
+      </Container>
+    </section>
+
+    {/* How it works */}
+    <Section muted>
+      <SectionHeading eyebrow="How it works" title="Answers you can understand and check" description="Every response follows the same transparent path, from your question to an explained answer." />
+      <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {steps.map((s, i) => (
+          <li key={s.title} className="relative rounded-2xl border border-slate-200 dark:border-slate-800 p-5 bg-slate-50/60 dark:bg-slate-950/40">
+            <div className="flex items-center gap-3">
+              <IconTile icon={s.icon} size="sm" />
+              <span className="text-xs font-medium text-slate-400">Step {i + 1}</span>
+            </div>
+            <h3 className="mt-4 font-semibold text-slate-900 dark:text-white">{s.title}</h3>
+            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </Section>
+
+    {/* Features */}
+    <Section>
+      <SectionHeading eyebrow="Capabilities" title="Powerful features for better healthcare" description="Cura combines cutting-edge AI with medical expertise to provide personalized healthcare assistance." />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {features.map((f) => (
+          <Card key={f.title} hover>
+            <IconTile icon={f.icon} />
+            <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">{f.title}</h3>
+            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{f.description}</p>
+          </Card>
+        ))}
+      </div>
+    </Section>
+
+    {/* CTA */}
+    <Section className="pt-0">
+      <CtaBand title="Ready to experience smarter healthcare?" description="Join thousands of users who trust Cura for their healthcare needs. Start your conversation today.">
+        <ButtonLink to="/chatbot" className="h-11 px-5">Try CURA-X now <ArrowRight className="w-4 h-4" /></ButtonLink>
+        <ButtonLink to="/use-cases" variant="secondary" className="h-11 px-5">See use cases</ButtonLink>
+      </CtaBand>
+    </Section>
+  </div>
+);
 
 export default Home;

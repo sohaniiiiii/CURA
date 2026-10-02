@@ -44,6 +44,18 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: Date.now
+  },
+  // Password reset (forgot-password flow). Only a SHA-256 hash of the
+  // one-time token is stored; the raw token exists only in the reset link.
+  resetPasswordTokenHash: {
+    type: String,
+    default: undefined,
+    select: false
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: undefined,
+    select: false
   }
 }, {
   timestamps: true
